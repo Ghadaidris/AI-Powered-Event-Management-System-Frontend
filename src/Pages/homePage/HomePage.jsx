@@ -11,6 +11,7 @@ export default function HomePage() {
         <div className="cta-buttons">
           <Link to="/login" className="btn-primary">Login</Link>
           <Link to="/about" className="btn-secondary">About</Link>
+          <Link to="/signup" className="btn-primary">Sign Up</Link>
         </div>
       </div>
 

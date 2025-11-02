@@ -10,6 +10,18 @@ export const login = (credentials) =>
     body: JSON.stringify(credentials)
   }).then(res => res.ok ? res.json() : Promise.reject('Login failed'));
 
+
+export const signup = (credentials) =>
+  fetch(`${BASE_URL}/signup/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  }).then(res => {
+    if (!res.ok) return res.json().then(err => Promise.reject(err));
+    return res.json();
+  });
+
+  
 export const getUser = () => sendRequest('/profiles/me/');
 export const getProfiles = () => sendRequest('/profiles/');
 export const getCompanies = () => sendRequest('/companies/');

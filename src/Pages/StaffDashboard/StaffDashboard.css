@@ -1,0 +1,85 @@
+/* frontend/src/pages/staffDashboard/StaffDashboard.css */
+.staff-dashboard {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  min-height: 100vh;
+  padding: 40px 20px;
+  color: white;
+}
+
+.staff-dashboard h1 {
+  text-align: center;
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+  background: linear-gradient(to right, #fff, #a0e7ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.welcome {
+  text-align: center;
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 30px;
+}
+
+.tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.task-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.task-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.task-card h3 {
+  margin: 0 0 12px;
+  font-size: 1.4rem;
+  color: #fff;
+}
+
+.task-card p {
+  margin: 8px 0;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.status {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.status.pending { background: #fdcb6e; color: #2d3436; }
+.status.in-progress { background: #00b894; color: white; }
+.status.completed { background: #00cec9; color: white; }
+
+.no-tasks {
+  text-align: center;
+  font-size: 1.3rem;
+  opacity: 0.8;
+  grid-column: 1 / -1;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.5rem;
+  padding: 60px;
+}

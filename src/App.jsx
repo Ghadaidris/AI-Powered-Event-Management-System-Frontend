@@ -4,19 +4,21 @@ import { getUser } from './utilities/users-api';
 import HomePage from './Pages/homePage/HomePage';
 import LoginPage from './Pages/loginPage/LoginPage';
 import AdminDashboard from './Pages/AdminDashboard/AdminDashboard';
-import AboutPage from './Pages/aboutPage/aboutPage';
-import SignUpPage from './Pages/SignUpPage/SignUpPage'
-import StaffDashboard from './Pages/StaffDashboard/StaffDashboard'
+import AboutPage from './Pages/aboutPage/AboutPage';
+import SignUpPage from './Pages/SignUpPage/SignUpPage';
+import StaffDashboard from './Pages/StaffDashboard/StaffDashboard';
 import OrganizerDashboard from './Pages/OrganizerDashboard/OrganizerDashboard';
 import ManagerDashboard from './Pages/ManagerDashboard/ManagerDashboard';
-
-
+import ManagedEventsPage from './Pages/ManagerDashboard/ManagedEventsPage';
+import TeamAssignmentPage from './Pages/ManagerDashboard/TeamAssignmentPage';
+import CompanyList from './Pages/CompanyList/CompanyList';
+import EventList from './Pages/EventList/EventList';
 
 function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('access');
     if (token) {
       getUser()
         .then(data => {
@@ -24,8 +26,8 @@ function App() {
           localStorage.setItem('role', data.role);
         })
         .catch(() => {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('accessrole');
+          localStorage.removeItem('access');
+          localStorage.removeItem('role');
           setUser(null);
         });
     }
@@ -33,10 +35,13 @@ function App() {
 
   return (
     <Routes>
+      {/* Public Pages */}
       <Route path="/" element={<HomePage user={user} setUser={setUser} />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/login" element={<LoginPage setUser={setUser} />} />
       <Route path="/signup" element={<SignUpPage setUser={setUser} />} />
+      <Route path="/companies" element={<CompanyList />} />
+      <Route path="/events" element={<EventList />} />
 
       {/* Role-based Dashboards */}
       <Route
@@ -51,11 +56,22 @@ function App() {
         path="/dashboard/organizer"
         element={user?.role === 'organizer' ? <OrganizerDashboard /> : <Navigate to="/login" />}
       />
+
+      {/* ✅ Manager Dashboard and Subpages */}
       <Route
         path="/dashboard/manager"
         element={user?.role === 'manager' ? <ManagerDashboard /> : <Navigate to="/login" />}
       />
+      <Route
+        path="/dashboard/manager/events"
+        element={user?.role === 'manager' ? <ManagedEventsPage /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/dashboard/manager/teams"
+        element={user?.role === 'manager' ? <TeamAssignmentPage /> : <Navigate to="/login" />}
+      />
 
+      {/* Catch-all */}
       <Route path="/*" element={<Navigate to="/" />} />
     </Routes>
   );

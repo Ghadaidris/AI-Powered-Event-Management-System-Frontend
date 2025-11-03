@@ -1,111 +1,100 @@
-
-.dashboard-container {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.dashboard-page {
   min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
 }
 
-.dashboard-header {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.dashboard-header h1 {
-  font-size: 2.8rem;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(to right, #fff, #a0e7ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.welcome {
-  font-size: 1.2rem;
-  opacity: 0.9;
-}
-
-.actions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.8rem;
-  max-width: 1200px;
-  margin: 0 auto 3rem;
-}
-
-.action-card {
+.dashboard-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 20px;
-  padding: 2rem;
-  text-align: center;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-  text-decoration: none;
+}
+
+.dashboard-navbar .logo {
+  font-size: 1.5rem;
   color: white;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.dashboard-navbar .nav-links a {
+  color: white;
+  margin: 0 1rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.logout-btn {
+  background: #e74c3c;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   cursor: pointer;
 }
 
-.action-card:hover {
-  transform: translateY(-12px);
-  background: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+.section {
+  margin: 2rem;
 }
 
-.action-card .icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+.btn-add {
   background: linear-gradient(45deg, #ff6b6b, #feca57);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.action-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.8rem;
-}
-
-.action-card p {
-  font-size: 1rem;
-  opacity: 0.9;
-  line-height: 1.5;
-}
-
-.ai-suggestion {
-  border: 2px dashed rgba(255, 255, 255, 0.4) !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-
-.ai-suggestion:hover {
-  border-style: solid !important;
-  background: rgba(255, 255, 255, 0.2) !important;
-}
-
-.quick-stats {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-  margin-top: 2rem;
-}
-
-.stat-mini {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 1rem 1.5rem;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
   border-radius: 50px;
   font-weight: 600;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  min-width: 140px;
-  text-align: center;
+  cursor: pointer;
+  margin-bottom: 1rem;
 }
 
-.stat-mini span {
-  font-size: 1.4rem;
-  display: block;
-  background: linear-gradient(45deg, #ff6b6b, #feca57);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.form-modal {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  padding: 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 1rem;
+}
+
+.form-modal input,
+.form-modal textarea,
+.form-modal select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-actions {
+  margin-top: 1rem;
+}
+
+.btn-delete {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
 }

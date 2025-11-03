@@ -154,3 +154,70 @@
   transform: translateY(-3px);
   box-shadow: 0 10px 25px rgba(255, 107, 107, 0.5);
 }
+/* في AdminDashboard.css */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 400px;
+  max-width: 90%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal h3 {
+  margin-top: 0;
+  background: linear-gradient(to right, #fff, #a0e7ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.modal input, .modal select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1rem;
+}
+
+.modal input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-primary, .btn-secondary {
+  flex: 1;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, #ff6b6b, #feca57);
+  color: white;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}

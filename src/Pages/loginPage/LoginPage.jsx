@@ -13,8 +13,12 @@ export default function LoginPage({ setUser }) {
     e.preventDefault();
     try {
       const data = await login(creds);
-      localStorage.setItem('accessToken', data.access);
+      
+      // ← عدّلي هنا: استخدمي 'refresh' مو 'refreshToken'
+      localStorage.setItem('access', data.access);
+      localStorage.setItem('refresh', data.refresh);  // ← هذا الصحيح
       localStorage.setItem('accessRole', data.role);
+
       setUser({ role: data.role });
 
       // تحويل بناءً على الـ role

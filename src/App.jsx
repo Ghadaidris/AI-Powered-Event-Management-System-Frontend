@@ -1,55 +1,61 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getUser } from './utilities/users-api';
-import HomePage from '../src/Pages/homePage/HomePage';
-import LoginPage from '../src/Pages/loginPage/LoginPage';
-import AdminDashboard from '../src/Pages/AdminDashboard/AdminDashboard';
-import AboutPage from '../src/Pages/aboutPage/aboutPage';
-import SignUpPage from '../src/Pages/SignUpPage/SignUpPage'
-import StaffDashboard from '../src/Pages/StaffDashboard/StaffDashboard'
+import HomePage from './Pages/homePage/HomePage';
+import LoginPage from './Pages/loginPage/LoginPage';
+import AdminDashboard from './Pages/AdminDashboard/AdminDashboard';
+import AboutPage from './Pages/aboutPage/aboutPage';
+import SignUpPage from './Pages/SignUpPage/SignUpPage'
+import StaffDashboard from './Pages/StaffDashboard/StaffDashboard'
+import OrganizerDashboard from './Pages/OrganizerDashboard/OrganizerDashboard';
+import ManagerDashboard from './Pages/ManagerDashboard/ManagerDashboard';
+
+
 
 function App() {
   const [user, setUser] = useState(null);
 
-
-useEffect(() => {
-    const token = localStorage.getItem('accessToken'); // ← ملاحظة الأستاذ
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
     if (token) {
       getUser()
         .then(data => {
-          setUser({ role: data.role });
+          setUser({ role: data.role, username: data.username });
           localStorage.setItem('role', data.role);
         })
         .catch(() => {
           localStorage.removeItem('accessToken');
-          localStorage.removeItem('role');
+          localStorage.removeItem('accessrole');
+          setUser(null);
         });
     }
-  
   }, []);
 
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<HomePage user={user} setUser={setUser} />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/login" element={<LoginPage setUser={setUser} />} />
-      <Route path="/signup" element={<SignUpPage setUser={setUser} />}/>
-      
+      <Route path="/signup" element={<SignUpPage setUser={setUser} />} />
 
-      {/* Admin Route */}
-      {user?.role === 'admin' ? (
-        <Route path="/dashboard/admin" element={<AdminDashboard />} />
-      ) : (
-        <Route path="/dashboard/admin" element={<Navigate to="/login" />} />
-      )}
+      {/* Role-based Dashboards */}
+      <Route
+        path="/dashboard/admin"
+        element={user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/dashboard/staff"
+        element={user?.role === 'staff' ? <StaffDashboard /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/dashboard/organizer"
+        element={user?.role === 'organizer' ? <OrganizerDashboard /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/dashboard/manager"
+        element={user?.role === 'manager' ? <ManagerDashboard /> : <Navigate to="/login" />}
+      />
 
-      {/* Staff Route */}
-      {user?.role === 'staff' ? (
-        <Route path="/dashboard/staff" element={<StaffDashboard />} />
-      ) : (
-        <Route path="/dashboard/staff" element={<Navigate to="/login" />} />
-      )}
-      
       <Route path="/*" element={<Navigate to="/" />} />
     </Routes>
   );

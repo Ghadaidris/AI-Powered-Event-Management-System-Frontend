@@ -1,4 +1,4 @@
-// frontend/src/utilities/users-api.js
+
 import sendRequest from './sendRequest';
 
 const BASE_URL = 'http://127.0.0.1:8000';
@@ -21,8 +21,22 @@ export const signup = (credentials) =>
     return res.json();
   });
 
-  
+
+
 export const getUser = () => sendRequest('/profiles/me/');
 export const getProfiles = () => sendRequest('/profiles/');
+export const updateProfile = (id, data) => sendRequest(`/profiles/${id}/`, 'PATCH', data);
+
+
+
+// Companies
 export const getCompanies = () => sendRequest('/companies/');
+export const createCompany = (data) => sendRequest('/companies/', 'POST', data);
+export const updateCompany = (id, data) => sendRequest(`/companies/${id}/`, 'PATCH', data);
+export const deleteCompany = (id) => sendRequest(`/companies/${id}/`, 'DELETE');
+
+// Events
 export const getEvents = () => sendRequest('/events/');
+export const createEvent = (data) => sendRequest('/events/', 'POST', data);
+export const updateEvent = (id, data) => sendRequest(`/events/${id}/`, 'PATCH', data);
+export const deleteEvent = (id) => sendRequest(`/events/${id}/`, 'DELETE');

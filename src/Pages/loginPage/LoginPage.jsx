@@ -14,12 +14,16 @@ export default function LoginPage({ setUser }) {
     try {
       const data = await login(creds);
       localStorage.setItem('accessToken', data.access);
-      localStorage.setItem('accessRole', data.role); // ← مهم
+      localStorage.setItem('accessRole', data.role);
       setUser({ role: data.role });
 
       // تحويل بناءً على الـ role
       if (data.role === 'admin') {
         navigate('/dashboard/admin');
+      } else if (data.role === 'organizer') {
+        navigate('/dashboard/organizer');
+      } else if (data.role === 'manager') {
+        navigate('/dashboard/manager');
       } else if (data.role === 'staff') {
         navigate('/dashboard/staff');
       } else {

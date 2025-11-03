@@ -1,4 +1,4 @@
-/* frontend/src/pages/loginPage/LoginPage.css */
+
 .login-container {
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -23,21 +23,22 @@
 }
 
 .login-box:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
 }
 
 .login-box h2 {
   text-align: center;
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   margin-bottom: 30px;
   background: linear-gradient(to right, #fff, #a0e7ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  font-weight: 700;
 }
 
 .login-box input {
   width: 100%;
-  padding: 15px;
+  padding: 15px 18px;
   margin: 12px 0;
   border: none;
   border-radius: 12px;
@@ -60,27 +61,28 @@
 
 .login-box button {
   width: 100%;
-  padding: 15px;
+  padding: 16px;
   background: linear-gradient(45deg, #ff6b6b, #feca57);
   color: white;
   border: none;
   border-radius: 12px;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 25px;
   transition: all 0.3s ease;
   box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
 }
 
 .login-box button:hover:not(:disabled) {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow: 0 15px 35px rgba(255, 107, 107, 0.6);
 }
 
 .login-box button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+  transform: none;
 }
 
 .error {
@@ -88,11 +90,35 @@
   text-align: center;
   margin-top: 15px;
   font-weight: 500;
-  animation: shake 0.3s ease;
+  animation: shake 0.4s ease;
+  background: rgba(255, 107, 107, 0.15);
+  padding: 8px;
+  border-radius: 8px;
 }
 
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.login-box input {
+  width: 100%;
+  padding: 15px 18px;
+  margin: 12px 0;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box; 
+  text-align: left;       
+  font-family: 'Poppins', sans-serif;
+}
+
+.login-box input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: left;
 }

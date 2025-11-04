@@ -9,8 +9,6 @@ import SignUpPage from './Pages/SignUpPage/SignUpPage';
 import StaffDashboard from './Pages/StaffDashboard/StaffDashboard';
 import OrganizerDashboard from './Pages/OrganizerDashboard/OrganizerDashboard';
 import ManagerDashboard from './Pages/ManagerDashboard/ManagerDashboard';
-import ManagedEventsPage from './Pages/ManagerDashboard/ManagedEventsPage';
-import TeamAssignmentPage from './Pages/ManagerDashboard/TeamAssignmentPage';
 import CompanyList from './Pages/CompanyList/CompanyList';
 import EventList from './Pages/EventList/EventList';
 import TeamsPage from './Pages/TeamsPage/TeamsPage'
@@ -66,14 +64,8 @@ function App() {
         path="/dashboard/manager"
         element={user?.role === 'manager' ? <ManagerDashboard /> : <Navigate to="/login" />}
       />
-      <Route
-        path="/dashboard/manager/events"
-        element={user?.role === 'manager' ? <ManagedEventsPage /> : <Navigate to="/login" />}
-      />
-      <Route
-        path="/dashboard/manager/teams"
-        element={user?.role === 'manager' ? <TeamAssignmentPage /> : <Navigate to="/login" />}
-      />
+      
+      
 
       {/* Catch-all */}
       <Route path="/*" element={<Navigate to="/" />} />

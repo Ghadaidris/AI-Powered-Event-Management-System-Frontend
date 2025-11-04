@@ -24,7 +24,6 @@ export const createEvent = (data) => sendRequest('/events/', 'POST', {
 });
 export const updateEvent = (id, data) => sendRequest(`/events/${id}/`, 'PATCH', data);
 export const deleteEvent = (id) => sendRequest(`/events/${id}/`, 'DELETE');
-export const getAISuggestions = (eventId) => sendRequest(`/events/${eventId}/ai-suggest/`, 'GET');
 
 // === TEAMS ===
 export const getTeams = () => sendRequest('/teams/');
@@ -50,10 +49,6 @@ export const createMission = (data) => sendRequest('/missions/', 'POST', {
 export const updateMission = (id, data) => sendRequest(`/missions/${id}/`, 'PATCH', data);
 export const deleteMission = (id) => sendRequest(`/missions/${id}/`, 'DELETE');
 
-// === AI WORKFLOW ===
-export const aiSplitMission = (missionId) => sendRequest(`/missions/${missionId}/ai_assign/`, 'POST');
-export const approveMission = (missionId) => sendRequest(`/missions/${missionId}/approve/`, 'PATCH');
-
 // === TASKS (Manager / Staff) ===
 export const getTasks = () => sendRequest('/tasks/');
 export const getStaffTasks = () => sendRequest('/tasks/my-tasks/');
@@ -73,6 +68,20 @@ export const updateTaskStatus = (taskId, status) =>
 
 export const requestTaskDeletion = (taskId) => 
   sendRequest(`/tasks/${taskId}/request-delete/`, 'POST');
+
+// === GEMINI AI ENDPOINTS ===
+// Organizer: Suggest Mission
+export const aiSuggestMission = (eventId) => 
+  sendRequest('/ai/suggest-mission/', 'POST', { event: eventId });
+
+// Manager: Split Mission into Subtasks
+export const aiSplitMission = (missionId) => 
+  sendRequest(`/missions/${missionId}/ai-split/`, 'POST');
+
+// Manager: Approve AI-Split Mission
+export const approveMission = (missionId, updates = []) => 
+  sendRequest(`/missions/${missionId}/approve/`, 'PATCH', { updates });
+
 // === Auth ===
 export const login = (credentials) =>
   fetch(`${BASE_URL}/login/`, {

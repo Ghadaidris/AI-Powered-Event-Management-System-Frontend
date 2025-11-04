@@ -1,4 +1,3 @@
-// frontend/src/pages/adminDashboard/AdminDashboard.jsx
 import { useEffect, useState } from 'react';
 import {
   getProfiles,
@@ -18,7 +17,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Create User Modal State
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [newUser, setNewUser] = useState({
     username: '',
@@ -27,7 +25,6 @@ export default function AdminDashboard() {
     role: 'staff'
   });
 
-  // Load initial data: User, Profiles, Companies, Events
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -57,7 +54,6 @@ export default function AdminDashboard() {
     loadData();
   }, []);
 
-  // Update user role (Staff, Organizer, Manager)
   const handleRoleChange = async (profileId, newRole) => {
     if (profileId === currentUserId) {
       alert("You cannot change your own role!");
@@ -74,7 +70,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Create new user via signup endpoint
   const handleCreateUser = async () => {
     if (!newUser.username || !newUser.email || !newUser.password) {
       alert('Please fill in all fields.');
@@ -93,11 +88,9 @@ export default function AdminDashboard() {
         throw new Error(error.detail || 'Signup failed');
       }
 
-      // Reset form & close modal
       setNewUser({ username: '', email: '', password: '', role: 'staff' });
       setShowCreateUser(false);
 
-      // Refresh profiles
       const updatedProfiles = await getProfiles();
       setProfiles(updatedProfiles);
       setStats(prev => ({ ...prev, users: updatedProfiles.length }));
@@ -108,7 +101,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Loading state
   if (loading) {
     return (
       <>
@@ -137,9 +129,6 @@ export default function AdminDashboard() {
             </button>
             <button className="action-btn secondary" onClick={() => navigate('/companies')}>
               Manage Companies
-            </button>
-            <button className="action-btn danger" onClick={() => alert('Coming soon: Delete inactive users')}>
-              Delete Inactive Users
             </button>
           </div>
         </section>

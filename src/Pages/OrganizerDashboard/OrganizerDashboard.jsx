@@ -3,7 +3,7 @@ import Navbar from '../../components/Navbar';
 import {
   getUser, getCompanies, createCompany, deleteCompany,
   getEvents, createEvent, getTeams, createTeam, getProfiles,
-  getAISuggestions, deleteTeam, getMissions, createMission, deleteMission
+  getMissions, createMission, deleteMission, aiSuggestMission
 } from '../../utilities/users-api';
 import './OrganizerDashboard.css';
 
@@ -15,68 +15,64 @@ export default function OrganizerDashboard() {
   const [teams, setTeams] = useState([]);
   const [profiles, setProfiles] = useState([]);
 
-  // Form Visibility
   const [showCompanyForm, setShowCompanyForm] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   const [showMissionForm, setShowMissionForm] = useState(false);
   const [showTeamForm, setShowTeamForm] = useState(false);
 
-  // Form Data
   const [formCompany, setFormCompany] = useState({ name: '' });
   const [formEvent, setFormEvent] = useState({ title: '', date: '', location: '', company: '' });
   const [formMission, setFormMission] = useState({ title: '', description: '', event: '', team: '' });
   const [formTeam, setFormTeam] = useState({ name: '', event: '', manager: '', members: [] });
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const [u, comps, evs, tms, missionsList, profs] = await Promise.all([
+        getUser(), getCompanies(), getEvents(), getTeams(), getMissions(), getProfiles()
+      ]);
+      setUser(u);
+      setCompanies(comps);
+      setEvents(evs);
+      setTeams(tms);
+      setMissions(missionsList);
+      setProfiles(profs);
+    } catch (err) {
+      console.error('Failed to load data:', err);
+      alert('خطأ في تحميل البيانات. تأكدي من تشغيل الـ Backend.');
+    }
+  };
+  fetchData();
+}, []);
 
-  // Fetch All Data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [u, comps, evs, tms, missionsList, profs] = await Promise.all([
-          getUser(), getCompanies(), getEvents(), getTeams(), getMissions(), getProfiles()
-        ]);
-
-        setUser(u);
-        setCompanies(comps);
-        setEvents(evs);
-        setTeams(tms); // Backend returns member_names
-        setMissions(missionsList);
-        setProfiles(profs);
-      } catch (err) {
-        console.error('Failed to load dashboard data:', err);
-        alert('Error loading data. Please try again.');
-      }
-    };
-    fetchData();
-  }, []);
-
-  // === Create Company ===
   const handleCreateCompany = async () => {
     if (!formCompany.name.trim()) return alert('Company name is required');
-    const newCompany = await createCompany(formCompany);
-    setCompanies(prev => [...prev, newCompany]);
-    setFormCompany({ name: '' });
-    setShowCompanyForm(false);
+    try {
+      const newCompany = await createCompany(formCompany);
+      setCompanies(prev => [...prev, newCompany]);
+      setFormCompany({ name: '' });
+      setShowCompanyForm(false);
+    } catch (err) {
+      alert('Failed to create company');
+    }
   };
 
-  // === Create Event ===
   const handleCreateEvent = async () => {
-    if (!formEvent.title || !formEvent.date || !formEvent.location) {
-      return alert('Please fill in all event fields');
+    if (!formEvent.title || !formEvent.date || !formEvent.location) return alert('Fill all event fields');
+    try {
+      const newEvent = await createEvent({
+        ...formEvent,
+        company: formEvent.company ? parseInt(formEvent.company) : null
+      });
+      setEvents(prev => [...prev, newEvent]);
+      setFormEvent({ title: '', date: '', location: '', company: '' });
+      setShowEventForm(false);
+    } catch (err) {
+      alert('Failed to create event');
     }
-    const newEvent = await createEvent({
-      ...formEvent,
-      company: formEvent.company ? parseInt(formEvent.company) : null
-    });
-    setEvents(prev => [...prev, newEvent]);
-    setFormEvent({ title: '', date: '', location: '', company: '' });
-    setShowEventForm(false);
   };
 
-  // === Create Team ===
   const handleCreateTeam = async () => {
-    if (!formTeam.name || !formTeam.event || !formTeam.manager) {
-      return alert('Team name, event, and manager are required');
-    }
+    if (!formTeam.name || !formTeam.event || !formTeam.manager) return alert('Team name, event, and manager are required');
     try {
       const payload = {
         name: formTeam.name,
@@ -84,43 +80,47 @@ export default function OrganizerDashboard() {
         manager: parseInt(formTeam.manager),
         members: formTeam.members.map(id => parseInt(id))
       };
-
       const newTeam = await createTeam(payload);
       setTeams(prev => [...prev, newTeam]);
       setFormTeam({ name: '', event: '', manager: '', members: [] });
       setShowTeamForm(false);
     } catch (err) {
-      console.error(err);
-      alert('Failed to create team. Please try again.');
+      alert('Failed to create team');
     }
   };
 
-  // === Create Mission ===
   const handleCreateMission = async () => {
-    if (!formMission.title || !formMission.event || !formMission.team) {
-      return alert('Mission title, event, and team are required');
-    }
-    const newMission = await createMission({
-      ...formMission,
-      event: parseInt(formMission.event),
-      team: parseInt(formMission.team)
-    });
-    setMissions(prev => [...prev, newMission]);
-    setFormMission({ title: '', description: '', event: '', team: '' });
-    setShowMissionForm(false);
-  };
-
-  // === AI Suggestion ===
-  const handleAISuggestion = async (itemId) => {
+    if (!formMission.title || !formMission.event || !formMission.team) return alert('Mission title, event, and team are required');
     try {
-      const suggestion = await getAISuggestions(itemId);
-      alert(`AI Suggestion:\n\n${suggestion.message || 'No suggestion available.'}`);
+      const newMission = await createMission({
+        ...formMission,
+        event: parseInt(formMission.event),
+        team: parseInt(formMission.team)
+      });
+      setMissions(prev => [...prev, newMission]);
+      setFormMission({ title: '', description: '', event: '', team: '' });
+      setShowMissionForm(false);
     } catch (err) {
-      alert('Failed to get AI suggestion');
+      alert('Failed to create mission');
     }
   };
 
-  if (!user) return <div className="loading">Loading Dashboard...</div>;
+const handleAISuggest = async (eventId) => {
+  try {
+    const suggestion = await aiSuggestMission(eventId);
+    setFormMission(prev => ({
+      ...prev,
+      title: suggestion.title,
+      description: suggestion.description,
+      event: eventId.toString()
+    }));
+    alert(`AI Suggested:\n\n${suggestion.title}\n${suggestion.description}`);
+  } catch (err) {
+    alert('AI suggestion failed');
+  }
+};
+
+  if (!user) return <div className="loading">Loading...</div>;
 
   return (
     <div className="dashboard-page">
@@ -134,17 +134,11 @@ export default function OrganizerDashboard() {
         {/* === Companies === */}
         <section className="section">
           <h2>Companies</h2>
-          <button onClick={() => setShowCompanyForm(true)} className="btn-add">
-            + Add Company
-          </button>
+          <button onClick={() => setShowCompanyForm(true)} className="btn-add">+ Add Company</button>
 
           {showCompanyForm && (
             <div className="form-modal">
-              <input
-                placeholder="Company Name"
-                value={formCompany.name}
-                onChange={e => setFormCompany({ name: e.target.value })}
-              />
+              <input placeholder="Company Name" value={formCompany.name} onChange={e => setFormCompany({ name: e.target.value })} />
               <button onClick={handleCreateCompany}>Save</button>
               <button onClick={() => setShowCompanyForm(false)}>Cancel</button>
             </div>
@@ -154,11 +148,9 @@ export default function OrganizerDashboard() {
             {companies.map(c => (
               <div key={c.id} className="card">
                 <h3>{c.name}</h3>
-                <div className="card-actions">
-                  <button onClick={() => deleteCompany(c.id).then(() => setCompanies(prev => prev.filter(x => x.id !== c.id)))} className="btn-delete">
-                    Delete
-                  </button>
-                </div>
+                <button onClick={() => deleteCompany(c.id).then(() => setCompanies(prev => prev.filter(x => x.id !== c.id)))} className="btn-delete">
+                  Delete
+                </button>
               </div>
             ))}
           </div>
@@ -167,9 +159,7 @@ export default function OrganizerDashboard() {
         {/* === Events === */}
         <section className="section">
           <h2>Events</h2>
-          <button onClick={() => setShowEventForm(true)} className="btn-add">
-            + Create Event
-          </button>
+          <button onClick={() => setShowEventForm(true)} className="btn-add">+ Create Event</button>
 
           {showEventForm && (
             <div className="form-modal">
@@ -191,9 +181,9 @@ export default function OrganizerDashboard() {
                 <h3>{e.title}</h3>
                 <p><strong>Date:</strong> {new Date(e.date).toLocaleDateString()}</p>
                 <p><strong>Location:</strong> {e.location}</p>
-                <div className="card-actions">
-                  <button onClick={() => handleAISuggestion(e.id)}>AI Suggest</button>
-                </div>
+                <button onClick={() => handleAISuggest(e.id)} className="btn-ai">
+                  AI Suggest Mission
+                </button>
               </div>
             ))}
           </div>
@@ -202,52 +192,44 @@ export default function OrganizerDashboard() {
         {/* === Teams === */}
         <section className="section">
           <h2>Teams</h2>
-          <button onClick={() => setShowTeamForm(true)} className="btn-add">
-            + Create Team
-          </button>
+          <button onClick={() => setShowTeamForm(true)} className="btn-add">+ Create Team</button>
 
           {showTeamForm && (
             <div className="form-modal">
               <input placeholder="Team Name" value={formTeam.name} onChange={e => setFormTeam({ ...formTeam, name: e.target.value })} />
-
               <select value={formTeam.event} onChange={e => setFormTeam({ ...formTeam, event: e.target.value })}>
                 <option value="">Select Event</option>
                 {events.map(ev => <option key={ev.id} value={ev.id}>{ev.title}</option>)}
               </select>
-
               <select value={formTeam.manager} onChange={e => setFormTeam({ ...formTeam, manager: e.target.value })}>
                 <option value="">Select Manager</option>
                 {profiles.filter(p => p.role === 'manager').map(m => (
                   <option key={m.id} value={m.id}>{m.username}</option>
                 ))}
               </select>
-
               <div className="team-members-section">
                 <p>Select Staff Members:</p>
                 <div className="checkbox-container">
-                  {profiles
-                    .filter(p => p.role === 'staff')
-                    .map(s => (
-                      <label key={s.id} className="checkbox-label">
-                        <input
-                          type="checkbox"
-                          checked={formTeam.members.includes(s.id.toString())}
-                          onChange={e => {
-                            const checked = e.target.checked;
-                            setFormTeam(prev => ({
-                              ...prev,
-                              members: checked
-                                ? [...prev.members, s.id.toString()]
-                                : prev.members.filter(id => id !== s.id.toString())
-                            }));
-                          }}
-                        />
-                        <span>{s.username}</span>
-                      </label>
-                    ))}
+                  {profiles.filter(p => p.role === 'staff').map(s => (
+                    <label key={s.id} className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={formTeam.members.includes(s.id.toString())}
+                        onChange={e => {
+                          const checked = e.target.checked;
+                          setFormTeam(prev => ({
+                            ...prev,
+                            members: checked
+                              ? [...prev.members, s.id.toString()]
+                              : prev.members.filter(id => id !== s.id.toString())
+                          }));
+                        }}
+                      />
+                      <span>{s.username}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
-
               <button onClick={handleCreateTeam}>Create Team</button>
               <button onClick={() => setShowTeamForm(false)}>Cancel</button>
             </div>
@@ -259,20 +241,10 @@ export default function OrganizerDashboard() {
                 <h3>{t.name}</h3>
                 <p><strong>Manager:</strong> {profiles.find(p => p.id === t.manager)?.username || 'N/A'}</p>
                 <p><strong>Event:</strong> {events.find(e => e.id === t.event)?.title || 'N/A'}</p>
-
-                {/* تم إضافة الكود هنا بالضبط */}
-                <p>
-                  <strong>Members:</strong>{' '}
-                  {t.member_names && t.member_names.length > 0
-                    ? t.member_names.join(', ')
-                    : 'No members assigned'}
-                </p>
-
-                <div className="card-actions">
-                  <button onClick={() => deleteTeam(t.id).then(() => setTeams(prev => prev.filter(x => x.id !== t.id)))} className="btn-delete">
-                    Delete
-                  </button>
-                </div>
+                <p><strong>Members:</strong> {t.member_names?.join(', ') || 'No members'}</p>
+                <button onClick={() => deleteTeam(t.id).then(() => setTeams(prev => prev.filter(x => x.id !== t.id)))} className="btn-delete">
+                  Delete
+                </button>
               </div>
             ))}
           </div>
@@ -281,9 +253,7 @@ export default function OrganizerDashboard() {
         {/* === Missions === */}
         <section className="section">
           <h2>Missions</h2>
-          <button onClick={() => setShowMissionForm(true)} className="btn-add">
-            + Add Mission
-          </button>
+          <button onClick={() => setShowMissionForm(true)} className="btn-add">+ Add Mission</button>
 
           {showMissionForm && (
             <div className="form-modal">
@@ -308,13 +278,10 @@ export default function OrganizerDashboard() {
                 <h3>{m.title}</h3>
                 {m.description && <p>{m.description}</p>}
                 <p><strong>Event:</strong> {events.find(e => e.id === m.event)?.title || 'N/A'}</p>
-                <p><strong>Team:</strong> {teams.find(t => t.id === m.team)?.name || 'N/A'}</p>
-                <div className="card-actions">
-                  <button onClick={() => handleAISuggestion(m.id)}>AI Plan</button>
-                  <button onClick={() => deleteMission(m.id).then(() => setMissions(prev => prev.filter(x => x.id !== m.id)))} className="btn-delete">
-                    Delete
-                  </button>
-                </div>
+                <p><strong>Team:</strong> {teams.find(t => t.id === t.team)?.name || 'N/A'}</p>
+                <button onClick={() => deleteMission(m.id).then(() => setMissions(prev => prev.filter(x => x.id !== m.id)))} className="btn-delete">
+                  Delete
+                </button>
               </div>
             ))}
           </div>

@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getUser, getTeams, getMissions, getEvents, getProfiles, aiSplitMission, approveMission } from '../../utilities/users-api';
+import { 
+  getUser, getTeams, getMissions, getEvents, getProfiles, 
+  aiSplitMission, approveMission 
+} from '../../utilities/users-api';
 import Navbar from '../../components/Navbar';
 import './ManagerDashboard.css';
 
@@ -14,7 +17,6 @@ export default function ManagerDashboard() {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
-  // تم التصليح: الـ Tab يظهر صح
   const pathParts = location.pathname.split('/');
   const currentTab = pathParts[pathParts.length - 1] === 'manager' ? 'teams' : pathParts[pathParts.length - 1];
 
@@ -45,7 +47,40 @@ export default function ManagerDashboard() {
   }, []);
 
   const myTeams = teams.filter(t => t.manager === user?.id);
-  const teamMissions = selectedTeam ? missions.filter(m => m.team === selectedTeam.id) : [];
+  const teamMissions = selectedTeam 
+    ? missions.filter(m => m.team === selectedTeam.id)
+    : [];
+
+  const handleAISplit = async (missionId) => {
+    try {
+      await aiSplitMission(missionId);
+      const updated = await getMissions();
+      setMissions(updated);
+      alert('Mission split by AI successfully!');
+    } catch (err) {
+      alert('Failed to split mission with AI');
+    }
+  };
+
+  const handleApprove = async (missionId, updatedSubtasks = []) => {
+    try {
+      const updates = updatedSubtasks.map(t => ({ id: t.id, title: t.title }));
+      await approveMission(missionId, updates);
+      const updated = await getMissions();
+      setMissions(updated);
+      alert('Mission approved and tasks updated!');
+    } catch (err) {
+      alert('Failed to approve mission');
+    }
+  };
+
+  const updateSubtaskTitle = (missionId, taskId, newTitle) => {
+    setMissions(prev => prev.map(m => 
+      m.id === missionId 
+        ? { ...m, subtasks: m.subtasks.map(st => st.id === taskId ? { ...st, title: newTitle } : st) }
+        : m
+    ));
+  };
 
   if (loading) return <p className="loading">Loading...</p>;
 
@@ -58,7 +93,6 @@ export default function ManagerDashboard() {
           <p>Hi, <strong>{user?.username}</strong>! Manage your teams & missions.</p>
         </header>
 
-        {/* === Teams Tab === */}
         {currentTab === 'teams' && (
           <section className="section">
             <h2>Your Teams</h2>
@@ -72,7 +106,6 @@ export default function ManagerDashboard() {
                   <h3>{team.name}</h3>
                   <p><strong>Event:</strong> {events.find(e => e.id === team.event)?.title || 'N/A'}</p>
                   <p><strong>Members:</strong> {team.member_names.join(', ')}</p>
-                  {/* تم حذف زر + Add Member */}
                 </div>
               ))}
             </div>
@@ -86,21 +119,52 @@ export default function ManagerDashboard() {
                     teamMissions.map(m => (
                       <div key={m.id} className="mission-card">
                         <h4>{m.title}</h4>
+
+                        {/* AI Split Button */}
                         {!m.ai_split && (
-                          <button onClick={() => aiSplitMission(m.id)} className="btn-ai">
+                          <button onClick={() => handleAISplit(m.id)} className="btn-ai">
                             AI Split
                           </button>
                         )}
-                        {m.ai_split && !m.approved && (
-                          <>
-                            <button onClick={() => approveMission(m.id)} className="btn-approve">
-                              Approve
-                            </button>
-                            <button className="btn-edit">Edit AI Plan</button>
-                            <button className="btn-ai">Re-Suggest AI</button>
-                          </>
+
+                        {/* AI Split Done → Show Subtasks + Edit + Approve */}
+                        {m.ai_split && !m.is_approved && (
+                          <div className="ai-plan">
+                            <h5>AI Suggested Subtasks:</h5>
+                            {m.subtasks?.length > 0 ? (
+                              <ul>
+                                {m.subtasks.map((t) => (
+                                  <li key={t.id}>
+                                    <strong>{profiles.find(p => p.id === t.assignee)?.username}:</strong>
+                                    <input
+                                      type="text"
+                                      defaultValue={t.title}
+                                      onChange={(e) => updateSubtaskTitle(m.id, t.id, e.target.value)}
+                                      style={{ marginLeft: '8px', padding: '4px' }}
+                                    />
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p>No subtasks generated.</p>
+                            )}
+
+                            <div className="actions">
+                              <button 
+                                onClick={() => handleApprove(m.id, m.subtasks)}
+                                className="btn-approve"
+                              >
+                                Approve Plan
+                              </button>
+                              <button className="btn-ai" onClick={() => handleAISplit(m.id)}>
+                                Re-Suggest AI
+                              </button>
+                            </div>
+                          </div>
                         )}
-                        {m.approved && <span className="status approved">Approved</span>}
+
+                        {/* Approved */}
+                        {m.is_approved && <span className="status approved">Approved</span>}
                       </div>
                     ))
                   ) : (
@@ -109,31 +173,6 @@ export default function ManagerDashboard() {
                 </div>
               </div>
             )}
-          </section>
-        )}
-
-        {/* === Events Tab === */}
-        {currentTab === 'events' && (
-          <section className="section">
-            <h2>Managed Events</h2>
-            <div className="grid">
-              {events.filter(e => teams.some(t => t.event === e.id && t.manager === user?.id)).map(e => (
-                <div key={e.id} className="card">
-                  <h3>{e.title}</h3>
-                  <p><strong>Date:</strong> {new Date(e.date).toLocaleDateString()}</p>
-                  <p><strong>Location:</strong> {e.location}</p>
-                  <p><strong>Teams:</strong> {teams.filter(t => t.event === e.id).map(t => t.name).join(', ')}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* === AI Suggestions Tab === */}
-        {currentTab === 'ai' && (
-          <section className="section">
-            <h2>AI Suggestions History</h2>
-            <p>Coming soon: View past AI plans and re-use them.</p>
           </section>
         )}
       </div>

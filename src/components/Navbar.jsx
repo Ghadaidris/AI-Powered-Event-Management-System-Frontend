@@ -13,12 +13,11 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('role');
+    localStorage.clear();
     navigate('/login');
   };
 
-  const isActive = (path) => (location.pathname === path ? 'active' : '');
+  const isActive = (path) => location.pathname.startsWith(path) ? 'active' : '';
 
   if (!user) return null;
 
@@ -27,6 +26,7 @@ export default function Navbar() {
       <Link to="/" className="logo">EventAI</Link>
 
       <div className="nav-links">
+        {/* Admin */}
         {user.role === 'admin' && (
           <>
             <Link to="/dashboard/admin" className={isActive('/dashboard/admin')}>Users</Link>
@@ -35,22 +35,25 @@ export default function Navbar() {
           </>
         )}
 
+        {/* Organizer */}
         {user.role === 'organizer' && (
           <>
             <Link to="/dashboard/organizer" className={isActive('/dashboard/organizer')}>Organize</Link>
-            <Link to="/ai" className={`ai-btn ${isActive('/ai')}`}>🤖 AI Assistant</Link>
+            <Link to="/ai" className={isActive('/ai')}>AI Assistant</Link>
           </>
         )}
 
+        {/* Manager – نُضيف Tabs داخل الـ Dashboard */}
         {user.role === 'manager' && (
           <>
             <Link to="/dashboard/manager" className={isActive('/dashboard/manager')}>Manage</Link>
-            <Link to="/ai" className={`ai-btn ${isActive('/ai')}`}>🤖 AI Assistant</Link>
+            <Link to="/ai" className={isActive('/ai')}>AI Assistant</Link>
           </>
         )}
 
+        {/* Staff */}
         {user.role === 'staff' && (
-          <Link to="/dashboard/staff" className={isActive('/dashboard/staff')}>Tasks</Link>
+          <Link to="/dashboard/staff" className={isActive('/dashboard/staff')}>My Tasks</Link>
         )}
 
         <button onClick={handleLogout} className="logout-btn">Logout</button>

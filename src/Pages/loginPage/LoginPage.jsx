@@ -1,13 +1,20 @@
 // frontend/src/pages/loginPage/LoginPage.jsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../utilities/users-api';
 import './LoginPage.css';
+
+const token = localStorage.getItem('access');
 
 export default function LoginPage({ setUser }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log({token})
+    if (token) navigate("/")
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault();

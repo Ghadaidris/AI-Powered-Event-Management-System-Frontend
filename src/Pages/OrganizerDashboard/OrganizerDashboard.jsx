@@ -1,17 +1,9 @@
 import { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import {
-  getUser,
-  getCompanies,
-  createCompany,
-  deleteCompany,
-  getEvents,
-  createEvent,
-  getTasks,
-  createTask,
-  getTeams,
-  createTeam,
-  getAISuggestions
+  getUser, getCompanies, createCompany, deleteCompany,
+  getEvents, createEvent, getTeams, createTeam, getProfiles,
+  getAISuggestions, deleteTeam, getMissions, createMission, deleteMission
 } from '../../utilities/users-api';
 import './OrganizerDashboard.css';
 
@@ -19,184 +11,310 @@ export default function OrganizerDashboard() {
   const [user, setUser] = useState(null);
   const [companies, setCompanies] = useState([]);
   const [events, setEvents] = useState([]);
-  const [tasks, setTasks] = useState([]);
+  const [missions, setMissions] = useState([]);
   const [teams, setTeams] = useState([]);
+  const [profiles, setProfiles] = useState([]);
 
-  // Forms
+  // Form Visibility
   const [showCompanyForm, setShowCompanyForm] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [showMissionForm, setShowMissionForm] = useState(false);
   const [showTeamForm, setShowTeamForm] = useState(false);
 
-  const [formCompany, setFormCompany] = useState({ name: '', description: '' });
-  const [formEvent, setFormEvent] = useState({ title: '', date: '', venue: '', company: '' });
-  const [formTask, setFormTask] = useState({ title: '', assignee: '', event: '' });
-  const [formTeam, setFormTeam] = useState({ name: '', event: '' });
+  // Form Data
+  const [formCompany, setFormCompany] = useState({ name: '' });
+  const [formEvent, setFormEvent] = useState({ title: '', date: '', location: '', company: '' });
+  const [formMission, setFormMission] = useState({ title: '', description: '', event: '', team: '' });
+  const [formTeam, setFormTeam] = useState({ name: '', event: '', manager: '', members: [] });
 
+  // Fetch All Data
   useEffect(() => {
-    getUser().then(setUser);
-    getCompanies().then(setCompanies);
-    getEvents().then(setEvents);
-    getTasks().then(setTasks);
-    getTeams().then(setTeams);
+    const fetchData = async () => {
+      try {
+        const [u, comps, evs, tms, missionsList, profs] = await Promise.all([
+          getUser(), getCompanies(), getEvents(), getTeams(), getMissions(), getProfiles()
+        ]);
+
+        setUser(u);
+        setCompanies(comps);
+        setEvents(evs);
+        setTeams(tms); // Backend returns member_names
+        setMissions(missionsList);
+        setProfiles(profs);
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err);
+        alert('Error loading data. Please try again.');
+      }
+    };
+    fetchData();
   }, []);
 
-  // === Companies ===
+  // === Create Company ===
   const handleCreateCompany = async () => {
+    if (!formCompany.name.trim()) return alert('Company name is required');
     const newCompany = await createCompany(formCompany);
-    setCompanies([...companies, newCompany]);
-    setFormCompany({ name: '', description: '' });
+    setCompanies(prev => [...prev, newCompany]);
+    setFormCompany({ name: '' });
     setShowCompanyForm(false);
   };
 
-  const handleDeleteCompany = async (id) => {
-    await deleteCompany(id);
-    setCompanies(companies.filter(c => c.id !== id));
-  };
-
-  // === Events ===
+  // === Create Event ===
   const handleCreateEvent = async () => {
-    const newEvent = await createEvent(formEvent);
-    setEvents([...events, newEvent]);
-    setFormEvent({ title: '', date: '', venue: '', company: '' });
+    if (!formEvent.title || !formEvent.date || !formEvent.location) {
+      return alert('Please fill in all event fields');
+    }
+    const newEvent = await createEvent({
+      ...formEvent,
+      company: formEvent.company ? parseInt(formEvent.company) : null
+    });
+    setEvents(prev => [...prev, newEvent]);
+    setFormEvent({ title: '', date: '', location: '', company: '' });
     setShowEventForm(false);
   };
 
-  // === Tasks ===
-  const handleCreateTask = async () => {
-    const newTask = await createTask(formTask);
-    setTasks([...tasks, newTask]);
-    setFormTask({ title: '', assignee: '', event: '' });
-    setShowTaskForm(false);
+  // === Create Team ===
+  const handleCreateTeam = async () => {
+    if (!formTeam.name || !formTeam.event || !formTeam.manager) {
+      return alert('Team name, event, and manager are required');
+    }
+    try {
+      const payload = {
+        name: formTeam.name,
+        event: parseInt(formTeam.event),
+        manager: parseInt(formTeam.manager),
+        members: formTeam.members.map(id => parseInt(id))
+      };
+
+      const newTeam = await createTeam(payload);
+      setTeams(prev => [...prev, newTeam]);
+      setFormTeam({ name: '', event: '', manager: '', members: [] });
+      setShowTeamForm(false);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to create team. Please try again.');
+    }
   };
 
-  // === Teams ===
-  const handleCreateTeam = async () => {
-    const newTeam = await createTeam(formTeam);
-    setTeams([...teams, newTeam]);
-    setFormTeam({ name: '', event: '' });
-    setShowTeamForm(false);
+  // === Create Mission ===
+  const handleCreateMission = async () => {
+    if (!formMission.title || !formMission.event || !formMission.team) {
+      return alert('Mission title, event, and team are required');
+    }
+    const newMission = await createMission({
+      ...formMission,
+      event: parseInt(formMission.event),
+      team: parseInt(formMission.team)
+    });
+    setMissions(prev => [...prev, newMission]);
+    setFormMission({ title: '', description: '', event: '', team: '' });
+    setShowMissionForm(false);
   };
 
   // === AI Suggestion ===
-  const handleAISuggestion = async (eventId) => {
-    const suggestion = await getAISuggestions(eventId);
-    alert(`🤖 AI Suggestion:\n${suggestion.message}`);
+  const handleAISuggestion = async (itemId) => {
+    try {
+      const suggestion = await getAISuggestions(itemId);
+      alert(`AI Suggestion:\n\n${suggestion.message || 'No suggestion available.'}`);
+    } catch (err) {
+      alert('Failed to get AI suggestion');
+    }
   };
 
-  if (!user) return <p>Loading...</p>;
+  if (!user) return <div className="loading">Loading Dashboard...</div>;
 
   return (
     <div className="dashboard-page">
       <Navbar />
-
-      <div className="dashboard-container organizer">
+      <div className="dashboard-container">
         <header className="dashboard-header">
           <h1>Organizer Dashboard</h1>
-          <p>Welcome, <strong>{user?.username}</strong>!</p>
+          <p>Welcome back, <strong>{user.username}</strong>!</p>
         </header>
 
-        {/* Companies Section */}
+        {/* === Companies === */}
         <section className="section">
           <h2>Companies</h2>
-          <button onClick={() => setShowCompanyForm(true)} className="btn-add">+ Add Company</button>
+          <button onClick={() => setShowCompanyForm(true)} className="btn-add">
+            + Add Company
+          </button>
+
           {showCompanyForm && (
             <div className="form-modal">
-              <input placeholder="Name" value={formCompany.name} onChange={e => setFormCompany({...formCompany, name: e.target.value})}/>
-              <textarea placeholder="Description" value={formCompany.description} onChange={e => setFormCompany({...formCompany, description: e.target.value})}/>
+              <input
+                placeholder="Company Name"
+                value={formCompany.name}
+                onChange={e => setFormCompany({ name: e.target.value })}
+              />
               <button onClick={handleCreateCompany}>Save</button>
               <button onClick={() => setShowCompanyForm(false)}>Cancel</button>
             </div>
           )}
+
           <div className="grid">
             {companies.map(c => (
               <div key={c.id} className="card">
                 <h3>{c.name}</h3>
-                <p>{c.description}</p>
-                <button onClick={() => handleDeleteCompany(c.id)} className="btn-delete">Delete</button>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Events Section */}
-        <section className="section">
-          <h2>Events</h2>
-          <button onClick={() => setShowEventForm(true)} className="btn-add">+ Create Event</button>
-          {showEventForm && (
-            <div className="form-modal">
-              <input placeholder="Title" value={formEvent.title} onChange={e => setFormEvent({...formEvent, title: e.target.value})}/>
-              <input type="date" value={formEvent.date} onChange={e => setFormEvent({...formEvent, date: e.target.value})}/>
-              <input placeholder="Venue" value={formEvent.venue} onChange={e => setFormEvent({...formEvent, venue: e.target.value})}/>
-              <select value={formEvent.company} onChange={e => setFormEvent({...formEvent, company: e.target.value})}>
-                <option value="">Select Company</option>
-                {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-              <button onClick={handleCreateEvent}>Save</button>
-              <button onClick={() => setShowEventForm(false)}>Cancel</button>
-            </div>
-          )}
-          <div className="grid">
-            {events.map(e => (
-              <div key={e.id} className="card">
-                <h3>{e.title}</h3>
-                <p>Date: {e.date}</p>
-                <p>Venue: {e.venue}</p>
                 <div className="card-actions">
-                  <button onClick={() => handleAISuggestion(e.id)}>🤖 AI Suggest</button>
+                  <button onClick={() => deleteCompany(c.id).then(() => setCompanies(prev => prev.filter(x => x.id !== c.id)))} className="btn-delete">
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Tasks Section */}
+        {/* === Events === */}
         <section className="section">
-          <h2>Tasks</h2>
-          <button onClick={() => setShowTaskForm(true)} className="btn-add">+ Add Task</button>
-          {showTaskForm && (
+          <h2>Events</h2>
+          <button onClick={() => setShowEventForm(true)} className="btn-add">
+            + Create Event
+          </button>
+
+          {showEventForm && (
             <div className="form-modal">
-              <input placeholder="Task Title" value={formTask.title} onChange={e => setFormTask({...formTask, title: e.target.value})}/>
-              <select value={formTask.event} onChange={e => setFormTask({...formTask, event: e.target.value})}>
-                <option value="">Select Event</option>
-                {events.map(e => <option key={e.id} value={e.id}>{e.title}</option>)}
+              <input placeholder="Event Title" value={formEvent.title} onChange={e => setFormEvent({ ...formEvent, title: e.target.value })} />
+              <input type="date" value={formEvent.date} onChange={e => setFormEvent({ ...formEvent, date: e.target.value })} />
+              <input placeholder="Location" value={formEvent.location} onChange={e => setFormEvent({ ...formEvent, location: e.target.value })} />
+              <select value={formEvent.company} onChange={e => setFormEvent({ ...formEvent, company: e.target.value })}>
+                <option value="">No Company</option>
+                {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
-              <input placeholder="Assignee (Staff Name)" value={formTask.assignee} onChange={e => setFormTask({...formTask, assignee: e.target.value})}/>
-              <button onClick={handleCreateTask}>Add Task</button>
-              <button onClick={() => setShowTaskForm(false)}>Cancel</button>
+              <button onClick={handleCreateEvent}>Save</button>
+              <button onClick={() => setShowEventForm(false)}>Cancel</button>
             </div>
           )}
+
           <div className="grid">
-            {tasks.map(t => (
-              <div key={t.id} className="card">
-                <h3>{t.title}</h3>
-                <p>Assigned to: {t.assignee}</p>
-                <p>Event: {events.find(e => e.id === t.event)?.title || 'N/A'}</p>
+            {events.map(e => (
+              <div key={e.id} className="card">
+                <h3>{e.title}</h3>
+                <p><strong>Date:</strong> {new Date(e.date).toLocaleDateString()}</p>
+                <p><strong>Location:</strong> {e.location}</p>
+                <div className="card-actions">
+                  <button onClick={() => handleAISuggestion(e.id)}>AI Suggest</button>
+                </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Teams Section */}
+        {/* === Teams === */}
         <section className="section">
           <h2>Teams</h2>
-          <button onClick={() => setShowTeamForm(true)} className="btn-add">+ Create Team</button>
+          <button onClick={() => setShowTeamForm(true)} className="btn-add">
+            + Create Team
+          </button>
+
           {showTeamForm && (
             <div className="form-modal">
-              <input placeholder="Team Name" value={formTeam.name} onChange={e => setFormTeam({...formTeam, name: e.target.value})}/>
-              <select value={formTeam.event} onChange={e => setFormTeam({...formTeam, event: e.target.value})}>
+              <input placeholder="Team Name" value={formTeam.name} onChange={e => setFormTeam({ ...formTeam, name: e.target.value })} />
+
+              <select value={formTeam.event} onChange={e => setFormTeam({ ...formTeam, event: e.target.value })}>
                 <option value="">Select Event</option>
-                {events.map(e => <option key={e.id} value={e.id}>{e.title}</option>)}
+                {events.map(ev => <option key={ev.id} value={ev.id}>{ev.title}</option>)}
               </select>
-              <button onClick={handleCreateTeam}>Create</button>
+
+              <select value={formTeam.manager} onChange={e => setFormTeam({ ...formTeam, manager: e.target.value })}>
+                <option value="">Select Manager</option>
+                {profiles.filter(p => p.role === 'manager').map(m => (
+                  <option key={m.id} value={m.id}>{m.username}</option>
+                ))}
+              </select>
+
+              <div className="team-members-section">
+                <p>Select Staff Members:</p>
+                <div className="checkbox-container">
+                  {profiles
+                    .filter(p => p.role === 'staff')
+                    .map(s => (
+                      <label key={s.id} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={formTeam.members.includes(s.id.toString())}
+                          onChange={e => {
+                            const checked = e.target.checked;
+                            setFormTeam(prev => ({
+                              ...prev,
+                              members: checked
+                                ? [...prev.members, s.id.toString()]
+                                : prev.members.filter(id => id !== s.id.toString())
+                            }));
+                          }}
+                        />
+                        <span>{s.username}</span>
+                      </label>
+                    ))}
+                </div>
+              </div>
+
+              <button onClick={handleCreateTeam}>Create Team</button>
               <button onClick={() => setShowTeamForm(false)}>Cancel</button>
             </div>
           )}
+
           <div className="grid">
             {teams.map(t => (
               <div key={t.id} className="card">
                 <h3>{t.name}</h3>
-                <p>Event: {events.find(e => e.id === t.event)?.title || 'N/A'}</p>
+                <p><strong>Manager:</strong> {profiles.find(p => p.id === t.manager)?.username || 'N/A'}</p>
+                <p><strong>Event:</strong> {events.find(e => e.id === t.event)?.title || 'N/A'}</p>
+
+                {/* تم إضافة الكود هنا بالضبط */}
+                <p>
+                  <strong>Members:</strong>{' '}
+                  {t.member_names && t.member_names.length > 0
+                    ? t.member_names.join(', ')
+                    : 'No members assigned'}
+                </p>
+
+                <div className="card-actions">
+                  <button onClick={() => deleteTeam(t.id).then(() => setTeams(prev => prev.filter(x => x.id !== t.id)))} className="btn-delete">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* === Missions === */}
+        <section className="section">
+          <h2>Missions</h2>
+          <button onClick={() => setShowMissionForm(true)} className="btn-add">
+            + Add Mission
+          </button>
+
+          {showMissionForm && (
+            <div className="form-modal">
+              <input placeholder="Mission Title" value={formMission.title} onChange={e => setFormMission({ ...formMission, title: e.target.value })} />
+              <textarea placeholder="Description (optional)" value={formMission.description} onChange={e => setFormMission({ ...formMission, description: e.target.value })} />
+              <select value={formMission.event} onChange={e => setFormMission({ ...formMission, event: e.target.value })}>
+                <option value="">Select Event</option>
+                {events.map(e => <option key={e.id} value={e.id}>{e.title}</option>)}
+              </select>
+              <select value={formMission.team} onChange={e => setFormMission({ ...formMission, team: e.target.value })}>
+                <option value="">Assign to Team</option>
+                {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+              <button onClick={handleCreateMission}>Add Mission</button>
+              <button onClick={() => setShowMissionForm(false)}>Cancel</button>
+            </div>
+          )}
+
+          <div className="grid">
+            {missions.map(m => (
+              <div key={m.id} className="card">
+                <h3>{m.title}</h3>
+                {m.description && <p>{m.description}</p>}
+                <p><strong>Event:</strong> {events.find(e => e.id === m.event)?.title || 'N/A'}</p>
+                <p><strong>Team:</strong> {teams.find(t => t.id === m.team)?.name || 'N/A'}</p>
+                <div className="card-actions">
+                  <button onClick={() => handleAISuggestion(m.id)}>AI Plan</button>
+                  <button onClick={() => deleteMission(m.id).then(() => setMissions(prev => prev.filter(x => x.id !== m.id)))} className="btn-delete">
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>

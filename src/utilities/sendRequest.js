@@ -55,6 +55,7 @@ export default async function sendRequest(path, method = 'GET', body = null) {
     }
 
     if (res.status === 204) return null;
+    // console.log()
     return await res.json();
   } catch (err) {
     console.error('Request failed:', err.message);

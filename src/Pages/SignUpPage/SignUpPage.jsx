@@ -1,10 +1,10 @@
 // frontend/src/pages/signupPage/SignUpPage.jsx
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signup } from '../../utilities/users-api';
 import './SignUpPage.css';
 
-
+const token = localStorage.getItem('access');
 export default function SignUpPage({ setUser }) {
     const [creds, setCreds] = useState({
         username: '',
@@ -15,6 +15,7 @@ export default function SignUpPage({ setUser }) {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -48,6 +49,9 @@ export default function SignUpPage({ setUser }) {
             setLoading(false);
         }
     };
+    useEffect(() => {
+        if (token) navigate("/")
+      }, [])
 
     return (
         <div className="signup-container">

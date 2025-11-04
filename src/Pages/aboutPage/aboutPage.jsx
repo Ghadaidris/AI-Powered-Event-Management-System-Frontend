@@ -1,48 +1,65 @@
-// frontend/src/pages/aboutPage/AboutPage.jsx
 import { Link } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
 import './AboutPage.css';
 
 export default function AboutPage() {
+  const teamMembers = [
+    { name: 'Sam Bassong', role: 'Instructor', icon: '🧑‍🏫' },
+    { name: 'Devlin Booth', role: 'Instructor', icon: '🧑‍🏫' },
+    { name: 'Cynthia Castillo', role: 'Instructor', icon: '🧑‍🏫' },
+    { name: 'Ghada Idris', role: 'Student', icon: '🧑‍🎓' }
+  ];
+
   return (
-    <div className="about-container">
-      <Link to="/" className="back-btn">Back to Home</Link>
+    <>
+      <Navbar />
 
-      <h1>About EventAI</h1>
-      <p>
-        <strong>EventAI</strong> is a modern, role-based event management system built from scratch using <strong>React</strong> and <strong>Django REST Framework</strong>. 
-        It empowers teams to organize, manage, and execute events with precision — all while maintaining strict access control.
-      </p>
-
-      <h2>Why I Built This</h2>
-      <p>
-        I wanted to create a system where every user sees <em>only what they need</em>:  
-        Admins control everything, Organizers plan events, Managers track progress, and Staff execute tasks — seamlessly.
-      </p>
-
-      <h2>Favorite Code Snippet</h2>
-      <p>
-        My favorite part is the <strong>dynamic navbar</strong> — it changes instantly based on the user's role:
-      </p>
-      <pre className="code-snippet">
-{`<nav>
-  {user?.role === 'admin' && <Link to="/dashboard/admin">Admin</Link>}
-  {user?.role === 'organizer' && <Link to="/dashboard/organizer">Organizer</Link>}
-</nav>`}
-      </pre>
-
-      <h2>Tech Stack</h2>
-      <div className="tech-stack">
-        <div className="tech">React</div>
-        <div className="tech">Django REST</div>
-        <div className="tech">JWT Auth</div>
-        <div className="tech">Glassmorphism UI</div>
-        <div className="tech">Responsive Design</div>
+      {/* Hero */}
+      <div className="about-hero">
+        <h1>About EventAI</h1>
+        <p>AI-powered platform to manage events, tasks, and teams efficiently</p>
       </div>
 
-      <p className="footer-note">
-        Built with passion for clean code, smart UX, and scalable systems.<br />
-        <strong>Future: AI-powered task suggestions</strong> (coming soon).
-      </p>
-    </div>
+      {/* Project Info */}
+      <div className="about-content">
+        <h2>Our Mission</h2>
+        <p>
+          EventAI aims to simplify event management using AI automation,
+          intelligent task distribution, and role-based access.
+        </p>
+
+        <h2>Why EventAI?</h2>
+        <p>
+          With AI suggestions, you can optimize teams, save time, and ensure
+          every event runs smoothly. Suitable for Admins, Organizers, Managers, and Staff.
+        </p>
+      </div>
+
+      {/* Team Section */}
+      <div className="team-section">
+        <h2>Meet the Team</h2>
+        <div className="team-cards">
+          {teamMembers.map(member => (
+            <div key={member.name} className="team-card">
+              <div className="team-icon">{member.icon}</div>
+              <h3>{member.name}</h3>
+              <p>{member.role}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="footer-content">
+          <p>© 2025 EventAI. All rights reserved.</p>
+          <div className="social-links">
+            <a href="https://twitter.com" target="_blank" rel="noreferrer">🐦</a>
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer">🔗</a>
+            <a href="https://github.com" target="_blank" rel="noreferrer">💻</a>
+          </div>
+        </div>
+      </footer>
+    </>
   );
 }

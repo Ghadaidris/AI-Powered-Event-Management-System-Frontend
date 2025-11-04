@@ -13,12 +13,14 @@ import ManagedEventsPage from './Pages/ManagerDashboard/ManagedEventsPage';
 import TeamAssignmentPage from './Pages/ManagerDashboard/TeamAssignmentPage';
 import CompanyList from './Pages/CompanyList/CompanyList';
 import EventList from './Pages/EventList/EventList';
+import TeamsPage from './Pages/TeamsPage/TeamsPage'
 
 function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('access');
+    console.log({token})
     if (token) {
       getUser()
         .then(data => {
@@ -38,10 +40,12 @@ function App() {
       {/* Public Pages */}
       <Route path="/" element={<HomePage user={user} setUser={setUser} />} />
       <Route path="/about" element={<AboutPage />} />
-      <Route path="/login" element={<LoginPage setUser={setUser} />} />
+      <Route path="/login" element={<LoginPage setUser={setUser} user={user} />} />
       <Route path="/signup" element={<SignUpPage setUser={setUser} />} />
       <Route path="/companies" element={<CompanyList />} />
       <Route path="/events" element={<EventList />} />
+      <Route path="/teams" element={<TeamsPage />} />
+
 
       {/* Role-based Dashboards */}
       <Route

@@ -1,47 +1,48 @@
-/* OrganizerDashboard.css */
+/* === Dashboard Page === */
 .dashboard-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-family: 'Poppins', sans-serif;
+  padding-bottom: 2rem;
 }
 
-.dashboard-navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
+/* === Container === */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
 }
 
-.dashboard-navbar .logo {
-  font-size: 1.5rem;
-  color: white;
-  font-weight: 700;
-  text-decoration: none;
+/* === Header === */
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
-.dashboard-navbar .nav-links a {
-  color: white;
-  margin: 0 1rem;
-  text-decoration: none;
-  font-weight: 500;
+.dashboard-header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.3rem;
 }
 
-.logout-btn {
-  background: #e74c3c;
-  border: none;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
+.dashboard-header p {
+  font-size: 1.1rem;
+  color: #f0f0f0;
 }
 
+/* === Sections === */
 .section {
-  margin: 2rem;
+  margin-bottom: 2.5rem;
 }
 
+.section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid rgba(255,255,255,0.2);
+  padding-bottom: 0.3rem;
+}
+
+/* === Buttons === */
 .btn-add {
   background: linear-gradient(45deg, #ff6b6b, #feca57);
   color: white;
@@ -51,20 +52,45 @@
   font-weight: 600;
   cursor: pointer;
   margin-bottom: 1rem;
-  transition: transform 0.2s;
+  transition: all 0.2s ease;
 }
 
-.btn-add:hover {
-  transform: translateY(-2px);
+.btn-add:hover { transform: translateY(-2px); }
+
+.btn-delete {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
 
+.btn-delete:hover { background: #c0392b; }
+
+.btn-ai {
+  background: #1abc9c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.btn-ai:hover { background: #16a085; }
+
+/* === Forms === */
 .form-modal {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
   padding: 1.5rem;
   border-radius: 16px;
   margin-bottom: 1rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
 .form-modal input,
@@ -85,6 +111,7 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* === Grid & Cards === */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -97,43 +124,17 @@
   border-radius: 16px;
   padding: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.card:hover {
-  transform: translateY(-4px);
+.card:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-.card-actions {
-  margin-top: 1rem;
-  display: flex;
-  gap: 0.5rem;
-}
-
-.btn-delete {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.btn-delete:hover {
-  background: #c0392b;
-}
-
-/* === Team Members Section === */
+/* === Team Members Checkbox Section === */
 .team-members-section {
   margin: 16px 0;
-}
-
-.team-members-section p {
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #fff;
-  font-size: 14px;
 }
 
 .checkbox-container {
@@ -157,9 +158,7 @@
   border-radius: 8px;
 }
 
-.checkbox-label:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
+.checkbox-label:hover { background: rgba(255, 255, 255, 0.15); }
 
 .checkbox-label input[type="checkbox"] {
   margin-right: 12px;
@@ -167,20 +166,19 @@
   transform: scale(1.2);
 }
 
-.checkbox-label span {
-  font-weight: 500;
-}
+.checkbox-label span { font-weight: 500; }
 
-/* Scrollbar Styling */
-.checkbox-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.checkbox-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+/* === Scrollbar === */
+.checkbox-container::-webkit-scrollbar { width: 6px; }
+.checkbox-container::-webkit-scrollbar-track { background: transparent; }
 .checkbox-container::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
+}
+
+/* === Loading === */
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 3rem;
 }

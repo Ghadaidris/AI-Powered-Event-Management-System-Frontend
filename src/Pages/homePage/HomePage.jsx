@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getUser } from '../../utilities/users-api';
+import { getUser, logout } from '../../utilities/users-api';
 import './HomePage.css';
 
 export default function HomePage() {
@@ -65,9 +65,11 @@ export default function HomePage() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
+
+    localStorage.removeItem('access');
     localStorage.removeItem('role');
     setUser(null);
+   
     navigate('/');
   };
 

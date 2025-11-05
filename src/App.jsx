@@ -65,8 +65,6 @@ function App() {
         element={user?.role === 'manager' ? <ManagerDashboard /> : <Navigate to="/login" />}
       />
       
-      
-
       {/* Catch-all */}
       <Route path="/*" element={<Navigate to="/" />} />
     </Routes>

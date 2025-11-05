@@ -51,6 +51,18 @@ export default function ManagerDashboard() {
     ? missions.filter(m => m.team === selectedTeam.id)
     : [];
 
+  // تحديث العنوان أو الوصف أو assignee لأي subtask
+  const updateSubtaskField = (missionId, taskId, field, value) => {
+    setMissions(prev => prev.map(m =>
+      m.id === missionId
+        ? {
+            ...m,
+            subtasks: m.subtasks.map(st => st.id === taskId ? { ...st, [field]: value } : st)
+          }
+        : m
+    ));
+  };
+
   const handleAISplit = async (missionId) => {
     try {
       await aiSplitMission(missionId);
@@ -58,28 +70,21 @@ export default function ManagerDashboard() {
       setMissions(updated);
       alert('Mission split by AI successfully!');
     } catch (err) {
+      console.error(err);
       alert('Failed to split mission with AI');
     }
   };
 
   const handleApprove = async (missionId, updatedSubtasks = []) => {
     try {
-      const updates = updatedSubtasks.map(t => ({ id: t.id, title: t.title }));
-      await approveMission(missionId, updates);
+      await approveMission(missionId, updatedSubtasks);
       const updated = await getMissions();
       setMissions(updated);
       alert('Mission approved and tasks updated!');
     } catch (err) {
+      console.error(err);
       alert('Failed to approve mission');
     }
-  };
-
-  const updateSubtaskTitle = (missionId, taskId, newTitle) => {
-    setMissions(prev => prev.map(m => 
-      m.id === missionId 
-        ? { ...m, subtasks: m.subtasks.map(st => st.id === taskId ? { ...st, title: newTitle } : st) }
-        : m
-    ));
   };
 
   if (loading) return <p className="loading">Loading...</p>;
@@ -134,12 +139,21 @@ export default function ManagerDashboard() {
                             {m.subtasks?.length > 0 ? (
                               <ul>
                                 {m.subtasks.map((t) => (
-                                  <li key={t.id}>
-                                    <strong>{profiles.find(p => p.id === t.assignee)?.username}:</strong>
+                                  <li key={t.id} style={{ marginBottom: '8px' }}>
+                                    <select
+                                      value={t.assignee}
+                                      onChange={(e) => updateSubtaskField(m.id, t.id, 'assignee', e.target.value)}
+                                    >
+                                      <option value="">Select Staff</option>
+                                      {profiles.filter(p => p.role === 'staff').map(p => (
+                                        <option key={p.id} value={p.id}>{p.username}</option>
+                                      ))}
+                                    </select>
                                     <input
                                       type="text"
-                                      defaultValue={t.title}
-                                      onChange={(e) => updateSubtaskTitle(m.id, t.id, e.target.value)}
+                                      value={t.title}
+                                      onChange={(e) => updateSubtaskField(m.id, t.id, 'title', e.target.value)}
+                                      placeholder="Task Title"
                                       style={{ marginLeft: '8px', padding: '4px' }}
                                     />
                                   </li>

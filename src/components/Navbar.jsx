@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { getUser } from '../utilities/users-api';
+import { getUser, logout } from '../utilities/users-api';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -14,7 +14,6 @@ export default function Navbar() {
 
   const handleLogout = () => {
     localStorage.clear();
-  
     navigate('/login');
   };
 

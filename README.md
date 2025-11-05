@@ -50,14 +50,23 @@ It provides a user-friendly interface with dashboards for Admins, Organizers, Ma
 ---
 
 ## 🔗 Backend Repository
-[Backend Repository Link](https://github.com/YOUR_USERNAME/backend-repo)
+[Backend Repository Link](https://github.com/Ghadaidris/AI-Powered-Event-Management-System-Backend)
 
 ---
 
 ## 🌐 Live Frontend Link
-[Deployed Frontend Link](https://YOUR_DEPLOYED_FRONTEND_URL)
+[Deployed Frontend Link](http://localhost:5173)
 
 ---
+## ❄️ IceBox Features (Future Enhancements)
+
+- 💬 **AI Chat Assistant** – for real-time event planning support.  
+- 🔔 **Smart Notifications** – to alert users about updates and deadlines.  
+- 📊 **Analytics Dashboard** – offering visual insights for organizers and managers.  
+- 🗓️ **Calendar Integration** – to automate and visualize event timelines.  
+- 🎨 **Customizable Themes** – allowing light/dark mode and branding colors.  
+- 🌐 **Multi-language Support** – available in both Arabic and English.  
+
 
 ## ⚙️ Installation Instructions
 

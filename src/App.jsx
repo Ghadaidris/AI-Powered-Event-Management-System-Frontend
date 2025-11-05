@@ -58,8 +58,6 @@ function App() {
         path="/dashboard/organizer"
         element={user?.role === 'organizer' ? <OrganizerDashboard /> : <Navigate to="/login" />}
       />
-
-      {/* ✅ Manager Dashboard and Subpages */}
       <Route
         path="/dashboard/manager"
         element={user?.role === 'manager' ? <ManagerDashboard /> : <Navigate to="/login" />}
